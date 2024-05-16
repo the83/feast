@@ -46,10 +46,10 @@ class RedisType(str, Enum):
     redis_sentinel = "redis_sentinel"
 
 
-class RedisOnlineStoreConfig(FeastConfigBaseModel):
+class RedisLightOnlineStoreConfig(FeastConfigBaseModel):
     """Online store config for Redis store"""
 
-    type: Literal["redis"] = "redis"
+    type: Literal["redis"] = "redis-light"
     """Online store type selector"""
 
     redis_type: RedisType = RedisType.redis
@@ -197,7 +197,7 @@ class RedisLightOnlineStore(OnlineStore):
 
         return startup_nodes, params
 
-    def _get_client(self, online_store_config: RedisOnlineStoreConfig):
+    def _get_client(self, online_store_config: RedisLightOnlineStoreConfig):
         """
         Creates the Redis client RedisCluster or Redis depending on configuration
         """
@@ -225,7 +225,7 @@ class RedisLightOnlineStore(OnlineStore):
                 self._client = Redis(**kwargs)
         return self._client
 
-    async def _get_client_async(self, online_store_config: RedisOnlineStoreConfig):
+    async def _get_client_async(self, online_store_config: RedisLightOnlineStoreConfig):
         if not self._client_async:
             startup_nodes, kwargs = self._parse_connection_string(
                 online_store_config.connection_string
@@ -260,7 +260,7 @@ class RedisLightOnlineStore(OnlineStore):
         progress: Optional[Callable[[int], Any]],
     ) -> None:
         online_store_config = config.online_store
-        assert isinstance(online_store_config, RedisOnlineStoreConfig)
+        assert isinstance(online_store_config, RedisLightOnlineStoreConfig)
 
         client = self._get_client(online_store_config)
         project = config.project
@@ -371,7 +371,7 @@ class RedisLightOnlineStore(OnlineStore):
         requested_features: Optional[List[str]] = None,
     ) -> List[Tuple[Optional[datetime], Optional[Dict[str, ValueProto]]]]:
         online_store_config = config.online_store
-        assert isinstance(online_store_config, RedisOnlineStoreConfig)
+        assert isinstance(online_store_config, RedisLightOnlineStoreConfig)
 
         client = self._get_client(online_store_config)
         feature_view = table
@@ -400,7 +400,7 @@ class RedisLightOnlineStore(OnlineStore):
         requested_features: Optional[List[str]] = None,
     ) -> List[Tuple[Optional[datetime], Optional[Dict[str, ValueProto]]]]:
         online_store_config = config.online_store
-        assert isinstance(online_store_config, RedisOnlineStoreConfig)
+        assert isinstance(online_store_config, RedisLightOnlineStoreConfig)
 
         client = await self._get_client_async(online_store_config)
         feature_view = table
